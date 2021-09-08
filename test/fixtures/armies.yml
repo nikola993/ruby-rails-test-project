@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  battle: one
+  name: MyString
+  units: 1
+  attack_strategy: 1
+
+two:
+  battle: two
+  name: MyString
+  units: 1
+  attack_strategy: 1
