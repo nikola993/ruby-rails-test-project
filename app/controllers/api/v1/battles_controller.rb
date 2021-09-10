@@ -25,8 +25,9 @@ module Api
 
       def create
         battle = Battle.new(battle_params)
+        status = BattleStatus.new(battle_id: battle.id)
 
-        if battle.save
+        if battle.save && status.save
           render json: battle
         else
           render json: { error: battle.errors }, status: 400
@@ -37,7 +38,7 @@ module Api
         battle = Battle.includes(:armies).find(params[:id])
         render josn: { error: battle.errors, message: 'Not found' }, status: 404 unless battle
 
-        BattleService.start_battle(battle)
+        BattleService.new(battle).start_battle
 
         if battle
           render json: { battle: battle, message: 'Battle started' }, status: 200

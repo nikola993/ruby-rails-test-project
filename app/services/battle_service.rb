@@ -2,39 +2,38 @@
 
 # Battle object
 class BattleService
-  def self.start_battle(battle)
-    unless battle.armies.size >= 3
-      return json: { error: 'start battle error', message: 'At least 3 armies are required' }, code: 400
-    end
-
-    return restart(battle) if Battle.statuses[battle.status] == 1
-
-    battle.update_attribute(:status, 1)
-    Thread.new { start(battle) }
-
-    {}
+  def initialize(battle)
+    @battle = battle
+    @status_logger = BattleStatusService.new(battle.id)
   end
 
-  def self.finish_battle(battle)
-    battle.update_attribute(:status, 4)
+  def start_battle
+    return { error: 'start error', message: 'At least 3 armies are required' } unless @battle.armies.size >= 3
+
+    battle_status = Battle.statuses[@battle.status]
+    return restart if [1, 3].include?(battle_status)
+
+    @battle.update_attribute(:status, 1)
+    @main_battle_thread = Thread.new { start }
   end
 
-  def self.start(battle)
+  private
+
+  def start
     armies = []
-    battle.armies.each do |army|
-      armies.push(ArmyService.new(army.name, army.units, army.attack_strategy))
+    @battle.armies.each do |army|
+      armies.push(ArmyService.new(army, @battle, @status_logger))
     end
 
-    puts 'Start battle'
     armies.each do |army|
       army.armies = armies
-      Thread.new { army.attack }
+      Thread.new { army.trigger_attack }
     end
   end
 
-  def self.restart(battle)
-    p battle, 'restart battle'
+  def restart
+    @main_battle_thread.&:kill
+    @status_logger.reset_logs
+    @main_battle_thread = Thread.new { start }
   end
-
-  private_class_method :start, :restart
 end

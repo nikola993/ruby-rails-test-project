@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :battles do
         resources :armies
+        resources :battle_statuses
       end
     end
   end

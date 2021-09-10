@@ -7,12 +7,12 @@ module Api
       before_action :sanitize_page_params
 
       def index
-        @armies = Army.all
+        @armies = Army.where(battle_id: params[:battle_id])
         render json: @armies
       end
 
       def show
-        armies = Army.where(battle_id: params[:id])
+        armies = Army.where(battle_id: params[:battle_id]).find(id: params[:id])
         render json: armies
       end
 
