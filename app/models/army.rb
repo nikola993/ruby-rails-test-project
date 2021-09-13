@@ -6,12 +6,12 @@ class Army < ApplicationRecord
             uniqueness: true
 
   validates :units,
-            presence: true,
-            numericality: { only_integer: true, in: (80..100) }
+            numericality: { greater_than_or_equal_to: 80, less_than_or_equal_to: 100 },
+            presence: true
 
   validates :attack_strategy,
-            presence: true,
-            numericality: { only_integer: true, in: (0..2) }
+            numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2 },
+            presence: true
 
   enum attack_strategy: %i[random strongest weakest]
 end

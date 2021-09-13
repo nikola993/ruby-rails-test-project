@@ -7,7 +7,7 @@ module Api
       before_action :sanitize_page_params
 
       def index
-        battles = Battle.includes(:armies).references(:posts)
+        battles = Battle.includes(:armies)
 
         battles_data = []
         battles.each do |battle|
@@ -18,32 +18,35 @@ module Api
       end
 
       def show
-        battle = Battle.find(params[:id])
-        armies = Army.where(battle: battle)
-        render json: { battle: battle, armies: armies }
+        battle = Battle.includes(:armies).find(params[:id])
+        if battle
+          render json: { battle: battle, armies: battle.armies }
+        else
+          render josn: { error: battle.errors, message: 'battle doesn not exist' }, status: 400
+        end
       end
 
       def create
         battle = Battle.new(battle_params)
-        status = BattleStatus.new(battle_id: battle.id)
+        battle.status = 0
+        battle.battle_status = BattleStatus.new
 
-        if battle.save && status.save
+        if battle.save
           render json: battle
         else
-          render json: { error: battle.errors }, status: 400
+          render json: { error: battle.errors, message: 'Unable to create battle' }, status: 400
         end
       end
 
       def update
         battle = Battle.includes(:armies).find(params[:id])
         render josn: { error: battle.errors, message: 'Not found' }, status: 404 unless battle
+        response = BattleService.new(battle).start_battle
 
-        BattleService.new(battle).start_battle
-
-        if battle
-          render json: { battle: battle, message: 'Battle started' }, status: 200
+        if response[:error]
+          render json: response, status: 400
         else
-          render josn: { error: battle.errors }, status: 400
+          render json: response, status: 200
         end
       end
 

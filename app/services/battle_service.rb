@@ -8,13 +8,14 @@ class BattleService
   end
 
   def start_battle
-    return { error: 'start error', message: 'At least 3 armies are required' } unless @battle.armies.size >= 3
+    return { error: 'start_battle error', message: 'At least 3 armies are required' } unless @battle.armies.size >= 3
 
-    battle_status = Battle.statuses[@battle.status]
-    return restart if [1, 3].include?(battle_status)
+    return restart if [1, 3].include?(Battle.statuses[@battle.status])
 
     @battle.update_attribute(:status, 1)
     @main_battle_thread = Thread.new { start }
+
+    { message: 'Battle started' }
   end
 
   private
@@ -26,8 +27,7 @@ class BattleService
     end
 
     armies.each do |army|
-      army.armies = armies
-      Thread.new { army.trigger_attack }
+      Thread.new { army.attack }
     end
   end
 
@@ -35,5 +35,7 @@ class BattleService
     @main_battle_thread.&:kill
     @status_logger.reset_logs
     @main_battle_thread = Thread.new { start }
+
+    { message: 'Battle restarted' }
   end
 end

@@ -12,7 +12,7 @@ module Api
       end
 
       def show
-        armies = Army.where(battle_id: params[:battle_id]).find(id: params[:id])
+        armies = Army.where(battle_id: params[:battle_id]).find(params[:id])
         render json: armies
       end
 
@@ -23,16 +23,6 @@ module Api
           render json: army
         else
           render json: { error: army.errors, message: 'Unable to create new army' }, status: 400
-        end
-      end
-
-      def update
-        army = Army.find(params[:id])
-
-        if army.update_attributes(army_params)
-          render json: army
-        else
-          render josn: { error: army.errors, message: 'Unable to update army' }, status: 400
         end
       end
 

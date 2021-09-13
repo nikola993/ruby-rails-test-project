@@ -6,11 +6,10 @@ class BattleStatusService
     @battle_id = battle_id
   end
 
-  def log_event(attacker, damage, target, armies)
+  def log_event(attacker, damage, target)
     status = BattleStatus.where(battle_id: @battle_id).first
-    status.with_lock do
+    status.with_advisory_lock('log_activity') do
       log_activity(status, attacker, damage, target)
-      log_battle_state(status, armies)
     end
   end
 
@@ -27,10 +26,5 @@ class BattleStatusService
   def log_activity(status, attacker, damage, target)
     attack_ditails = "[#{attacker[:units]}]#{attacker[:name]} -> (#{damage}) -> [#{target[:units]}]#{target[:name]}"
     status.update_attribute(:activity, "#{status.activity}---#{attack_ditails}")
-  end
-
-  def log_battle_state(status, armies)
-    armies_hash = Hash[armies.map { |army| [army.name, [army.units, army.strategy]] }]
-    status.update_attribute(:state, armies_hash.to_json)
   end
 end
