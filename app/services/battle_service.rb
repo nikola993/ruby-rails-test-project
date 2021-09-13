@@ -12,7 +12,7 @@ class BattleService
 
     return restart if [1, 3].include?(Battle.statuses[@battle.status])
 
-    @battle.update_attribute(:status, 1)
+    @battle.update_column(:status, 1)
     @main_battle_thread = Thread.new { start }
 
     { message: 'Battle started' }
@@ -33,7 +33,9 @@ class BattleService
 
   def restart
     @main_battle_thread.&:kill
-    @status_logger.reset_logs
+    @status_logger.reset_game(@battle)
+
+    @battle.update_column(:status, 1)
     @main_battle_thread = Thread.new { start }
 
     { message: 'Battle restarted' }

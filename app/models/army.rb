@@ -14,4 +14,12 @@ class Army < ApplicationRecord
             presence: true
 
   enum attack_strategy: %i[random strongest weakest]
+
+  before_create :init_values
+
+  def init_values
+    battle_status = BattleStatus.find(battle_id)
+    battle_status.init_state.push(self).to_json
+    battle_status.save
+  end
 end

@@ -10,36 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_210_908_100_832) do
+ActiveRecord::Schema.define(version: 2021_09_13_175455) do
+
   # These are extensions that must be enabled in order to support this database
-  enable_extension 'plpgsql'
+  enable_extension "plpgsql"
 
-  create_table 'armies', force: :cascade do |t|
-    t.bigint 'battle_id', null: false
-    t.string 'name', null: false
-    t.integer 'units', null: false
-    t.integer 'attack_strategy', null: false
-    t.datetime 'created_at', precision: 6, null: false
-    t.datetime 'updated_at', precision: 6, null: false
-    t.index ['battle_id'], name: 'index_armies_on_battle_id'
+  create_table "armies", force: :cascade do |t|
+    t.bigint "battle_id", null: false
+    t.string "name", null: false
+    t.integer "units", null: false
+    t.integer "attack_strategy", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["battle_id"], name: "index_armies_on_battle_id"
   end
 
-  create_table 'battle_statuses', force: :cascade do |t|
-    t.text 'activity'
-    t.json 'state'
-    t.datetime 'created_at', precision: 6, null: false
-    t.datetime 'updated_at', precision: 6, null: false
-    t.bigint 'battle_id'
-    t.index ['battle_id'], name: 'index_battle_statuses_on_battle_id'
+  create_table "battle_statuses", force: :cascade do |t|
+    t.text "activity"
+    t.json "init_state"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "battle_id"
+    t.index ["battle_id"], name: "index_battle_statuses_on_battle_id"
   end
 
-  create_table 'battles', force: :cascade do |t|
-    t.integer 'status'
-    t.string 'battle_id'
-    t.datetime 'created_at', precision: 6, null: false
-    t.datetime 'updated_at', precision: 6, null: false
+  create_table "battles", force: :cascade do |t|
+    t.integer "status"
+    t.string "battle_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
-  add_foreign_key 'armies', 'battles'
-  add_foreign_key 'battle_statuses', 'battles'
+  add_foreign_key "armies", "battles"
+  add_foreign_key "battle_statuses", "battles"
 end

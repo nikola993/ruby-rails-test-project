@@ -13,11 +13,16 @@ class BattleStatusService
     end
   end
 
-  def reset_logs
+  def reset_game(battle)
     BattleStatus.transaction do
-      status = BattleStatus.where(battle_id: @battle_id).first
-      status.update_attribute(:activity, '')
-      status.update_attribute(:state, {}.to_json)
+      status = BattleStatus.find(@battle_id)
+      status.update_column(:activity, '')
+
+      battle.update_column(:status, 1)
+
+      status.init_state.each do |init_army|
+        battle.armies.where(name: init_army['name']).first.update_column(:units, init_army['units'])
+      end
     end
   end
 
